@@ -108,13 +108,14 @@ namespace CodeLouisvilleUnitTestProject
         {
             if (NumberOfPassengers - removePassengerCount < 0)
             {
+                MilesPerGallon = MilesPerGallon + (NumberOfPassengers * 0.2);
                 NumberOfPassengers = 0;
             }
             else
             { 
                 NumberOfPassengers = NumberOfPassengers -= removePassengerCount;
+                MilesPerGallon = MilesPerGallon + (removePassengerCount * 0.2);
             }
-            MilesPerGallon = MilesPerGallon + (removePassengerCount * 0.2);
         }
 
     }
