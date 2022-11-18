@@ -1,4 +1,6 @@
-﻿namespace CodeLouisvilleUnitTestProject
+﻿using System.Runtime.InteropServices;
+
+namespace CodeLouisvilleUnitTestProject
 {
     public class Vehicle
     {
@@ -10,6 +12,7 @@
         public int NumberOfTires { get; init; }
         public string GasLevel => $"{_gasRemaining / GasTankCapacity * 100}%";
         public double MilesRemaining => _gasRemaining * MilesPerGallon;
+        public double GasRemaining => _gasRemaining;
         public double Mileage => _mileage;
         public bool HasFlatTire { get; set; }
         #endregion
@@ -105,7 +108,8 @@
             return statusString;
         }
 
-        protected async Task ChangeTireAsync()
+//        protected async Task ChangeTireAsync()
+        public async Task ChangeTireAsync()
         {
             if (!HasFlatTire)
                 throw new NoTireToChangeException();
@@ -121,7 +125,7 @@
         /// </summary>
         /// <param name="milesDriven"></param>
         /// <returns></returns>
-        private bool GotFlatTire(double milesDriven, int rngSeed = 0)
+        public bool GotFlatTire(double milesDriven, int rngSeed = 0)
         {
             double probabilityOfFlatPerMile = 1 - _flatTireChance;
             double probPerMile = Math.Pow(probabilityOfFlatPerMile, milesDriven);

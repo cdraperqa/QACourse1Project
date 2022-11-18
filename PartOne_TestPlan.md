@@ -1,4 +1,4 @@
-# QACourse1Project
+# QACourse1Project - Part One
 
 ## Testing new Brand filter on www.target.com as applied to toilet paper products
 

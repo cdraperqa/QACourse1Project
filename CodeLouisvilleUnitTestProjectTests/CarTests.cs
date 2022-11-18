@@ -20,7 +20,7 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void NewCarIsAVehicleAndHas4TiresTest()
         {
             //arrange
-            Car car = new Car();
+            Car car = new();
 
             //act
 
@@ -28,7 +28,7 @@ namespace CodeLouisvilleUnitTestProjectTests
             using (new AssertionScope())
             {
                 //need to check that car inherits from Vehicle type
-                //var res2 = car.GetType().GetTypeInfo();
+                car.GetType().IsSubclassOf(typeof(Vehicle)).Should().Be(true);
                 car.NumberOfTires.Should().Be(4);
             }
         }
@@ -39,62 +39,89 @@ namespace CodeLouisvilleUnitTestProjectTests
         public async void ModelIsValidForMakeTest(string make, string model, bool expectedResult)
         {
             //arrange
-            Car car = new Car();
-            car.Make = make;
-            car.Model = model;
+            Car car = new()
+            {
+                Make = make,
+                Model = model
+            };
 
             //act
             bool actualResult = await car.IsValidModelForMakeAsync();
 
             //assert
-            Assert.Equal(expectedResult, actualResult);            
+            actualResult.Should().Be(expectedResult);   
+        }
+
+        [Fact]
+        public async void ModelMadeInYearTestNegativeTest()
+        {
+            //arrange
+            Exception exception = new();
+            Car car = new()
+            {
+                Make = "Ford",
+                Model = "Escort"
+            };
+
+            //act
+            try
+            {
+                bool actualResult = await car.WasModelMadeInYearAsync(1990);
+            }
+            catch (Exception ex)
+            { 
+                exception = ex;
+            }
+
+            //assert
+            using (new AssertionScope())
+            {
+                exception.GetType().Name.Should().Be("ArgumentException");
+                exception.Message.Should().Be("No data is available for years before 1995");
+            }
         }
 
         [Theory]
         [InlineData("Honda", "Camry", 2020, false)]
         [InlineData("Subaru", "WRX", 2020, true)]
-        //ADD IN CATCH FOR EXCEPTION FOR CARS <1995
-        public async void ModelMadeInYearTest (string make, string model, int year, bool expectedResult)
+        [InlineData("Subaru", "WRX", 2000, false)]
+        public async void ModelMadeInYearTestPositiveTest (string make, string model, int year, bool expectedResult)
         {
             //arrange
-            Car car = new Car();
-            car.Make = make;
-            car.Model = model;
+            Car car = new()
+            {
+                Make = make,
+                Model = model
+            };
 
             //act
             bool actualResult = await car.WasModelMadeInYearAsync(year);
 
             //assert
-            Assert.Equal(expectedResult, actualResult);
+            actualResult.Should().Be(expectedResult);
         }
+
         [Fact]
         public void AddPassengersTest()
         {
             //arrange
-            int startingPassengers = 0;
-            double startingMilesPerGallon = 0;
-
-            Car car = new Car(10, "Toyota", "Camry", 20);
-            startingPassengers = car.NumberOfPassengers;
-            startingMilesPerGallon = car.MilesPerGallon;
             int passengerChange = 2;
+            Car car = new(10, "Toyota", "Camry", 20);
+            int startingPassengers = car.NumberOfPassengers;
+            double startingMilesPerGallon = car.MilesPerGallon;
 
             //act
             car.AddPassengers(passengerChange);
-            int endingPassengers = car.NumberOfPassengers;
-            double endingMilesPerGallon = car.MilesPerGallon;
 
             //assert
             using (new AssertionScope())
             {
-                endingPassengers.Should().Be(startingPassengers + passengerChange);
-                endingMilesPerGallon.Should().Be(startingMilesPerGallon - (passengerChange * 0.2));
-                passengerChange = passengerChange * -1;
+                car.NumberOfPassengers.Should().Be(startingPassengers + passengerChange);
+                car.MilesPerGallon.Should().Be(startingMilesPerGallon - (passengerChange * 0.2));
+                passengerChange *= -1;
                 car.AddPassengers(passengerChange);
-                endingPassengers = car.NumberOfPassengers;
-                endingMilesPerGallon = car.MilesPerGallon;
-                endingPassengers.Should().Be(startingPassengers);
-                endingMilesPerGallon.Should().Be(startingMilesPerGallon);
+                car.NumberOfPassengers.Should().Be(startingPassengers);
+                car.MilesPerGallon.Should().Be(startingMilesPerGallon);
             }
         }
 
@@ -105,8 +132,10 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void RemovePassengersTest(int Passengers, double milesPerGallon, int passengerChange, int expectedPassengers, double expectedMPG)
         {
             //arrange
-            Car car = new Car(10, "Toyota", "Camry", 20);
-            car.MilesPerGallon = milesPerGallon;
+            Car car = new(10, "Toyota", "Camry", 20)
+            {
+                MilesPerGallon = milesPerGallon
+            };
             car.AddPassengers(Passengers);
 
             //act

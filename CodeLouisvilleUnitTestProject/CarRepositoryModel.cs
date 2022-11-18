@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 
 namespace CodeLouisvilleUnitTestProject
 {
-    internal class CarRepositoryModel
+    public class CarRepositoryModel
     {
         public int Count { get; set; }
         public string Message { get; set; }

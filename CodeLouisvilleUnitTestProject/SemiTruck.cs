@@ -1,20 +1,19 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 namespace CodeLouisvilleUnitTestProject
 {
     public class SemiTruck : Vehicle
     {
-        public List<CargoItem> Cargo { get; private set; } = new List<CargoItem>();
+        public List<CargoItem> Cargo { get; private set; } = new();
 
         /// <summary>
         /// Creates a new SemiTruck that always has 18 Tires
         /// </summary>
         public SemiTruck()
         {
-            //YOUR CODE HERE:  --Trent says should be 1 line
             NumberOfTires =  18;
-            //Cargo = new List<CargoItem>();
         }
 
         /// <summary>
@@ -23,7 +22,6 @@ namespace CodeLouisvilleUnitTestProject
         /// <param name="item">The CargoItem to add</param>
         public void LoadCargo(CargoItem item)
         {
-            //YOUR CODE HERE -- Trent says should be 1 line
             Cargo.Add(item);
         }
             
@@ -37,13 +35,11 @@ namespace CodeLouisvilleUnitTestProject
         {
            try
             {
-                //var itemToRemove = Cargo.First(Name == name);
                 CargoItem itemToRemove = Cargo.Where(x => x.Name == name).First();
                 Cargo.Remove(itemToRemove);
                 return itemToRemove;
             }
             catch (Exception cref)
-            //catch (ArgumentException cref)
             {
                 throw new ArgumentException(name + " not found.", cref);
             }
@@ -56,7 +52,7 @@ namespace CodeLouisvilleUnitTestProject
         /// <returns>A List of CargoItems with the exact name passed</returns>
         public List<CargoItem> GetCargoItemsByName(string name)
         {
-            List<CargoItem> returnNameList = new List<CargoItem>();
+            List<CargoItem> returnNameList = new ();
             foreach (var item in Cargo)
             {
                 if (item.Name == name)
@@ -74,7 +70,7 @@ namespace CodeLouisvilleUnitTestProject
         /// <returns>A List of CargoItems with a description containing the passed description</returns>
         public List<CargoItem> GetCargoItemsByPartialDescription(string description)
         {
-            List<CargoItem> returnDescList = new List<CargoItem>();
+            List<CargoItem> returnDescList = new ();
             foreach (var item in Cargo)
             {
                 if (item.Description.Contains(description))
@@ -98,18 +94,10 @@ namespace CodeLouisvilleUnitTestProject
             }
             return itemQuantity;
         }
-        public void InitializeCargoList()
+
+        public void LoadCargoList(List<CargoItem> cargoList)
         {
-            Cargo.Add(new CargoItem("purple boxes", "moving supplies", 27));
-            Cargo.Add(new CargoItem("blue boxes", "moving supplies", 25));
-            Cargo.Add(new CargoItem("red boxes", "moving supplies", 10));
-            Cargo.Add(new CargoItem("green boxes", "moving supplies", 30));
-            Cargo.Add(new CargoItem("purple boxes", "moving supplies", 23));
-            Cargo.Add(new CargoItem("bleach", "cleaning supplies", 15));
-            Cargo.Add(new CargoItem("mops", "cleaning supplies", 20));
-            Cargo.Add(new CargoItem("white paint", "home decor", 20));
-            Cargo.Add(new CargoItem("black paint", "home decor", 20));
-            Cargo.Add(new CargoItem("grey paint", "home decor", 10));
+            Cargo = cargoList;
         }
     }
 }

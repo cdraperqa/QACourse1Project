@@ -1,12 +1,14 @@
 ﻿using CodeLouisvilleUnitTestProject;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using System.Xml.Linq;
 
 namespace CodeLouisvilleUnitTestProjectTests
 {
     public class SemiTruckTests
     {
-
+        private List<CargoItem> TestCargoList { get; set; }
+        
         //Verify that the SemiTruck constructor creates a new SemiTruck
         //object which is also a Vehicle and has 18 wheels. Verify that the
         //Cargo property for the newly created SemiTruck is a List of
@@ -15,18 +17,18 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void NewSemiTruckIsAVehicleAndHas18TiresAndEmptyCargoTest()
         {
             //arrange
-            SemiTruck semiTruck = new SemiTruck();
+            SemiTruck semiTruck = new ();
 
             //act
 
             //assert
             using (new AssertionScope())
             {
+                semiTruck.GetType().IsSubclassOf(typeof(Vehicle)).Should().Be(true);
                 semiTruck.NumberOfTires.Should().Be(18);
                 semiTruck.Cargo.Should().BeEmpty();
                 semiTruck.Cargo.Should().NotBeNull();
             }
-
         }
 
         //Verify that adding a CargoItem using LoadCargo does successfully add
@@ -36,10 +38,10 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void LoadCargoTest()
         {
             //arrange
-            CargoItem cargoToAdd = new CargoItem("packing tape", "moving supplies", 50);
+            CargoItem cargoToAdd = new ("packing tape", "moving supplies", 50);
+            SemiTruck semiTruck = new ();
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
             semiTruck.LoadCargo(cargoToAdd);
 
             //assert
@@ -56,11 +58,12 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void UnloadCargoWithValidCargoTest()
         {
             //arrange
-            CargoItem cargoToRemove = new CargoItem("blue boxes", "moving supplies", 25);
+            CargoItem cargoToRemove = new ("blue boxes", "moving supplies", 25);
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             CargoItem unloadedItem = semiTruck.UnloadCargo(cargoToRemove.Name);
 
             //assert
@@ -77,24 +80,28 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void UnloadCargoWithInvalidCargoTest()
         {
             //arrange
-            string exceptionMessage = "";
-            CargoItem cargoToRemove = new CargoItem("packing tape", "moving supplies", 50);
+            Exception exception = new();
+            CargoItem cargoToRemove = new ("packing tape", "moving supplies", 50);
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             try
             {
                 semiTruck.UnloadCargo(cargoToRemove.Name);
             }
-            catch (ArgumentException e)
+            catch (ArgumentException ex)
             {
-                exceptionMessage = e.Message;
+                exception = ex;
             }
 
             //assert
-            exceptionMessage.Should().Be("packing tape not found.");
-
+            using (new AssertionScope())
+            {
+                exception.GetType().Name.Should().Be("ArgumentException");
+                exception.Message.Should().Be("packing tape not found.");
+            }
         }
 
         //Verify that getting cargo items by name returns all items
@@ -104,18 +111,20 @@ namespace CodeLouisvilleUnitTestProjectTests
         {
             //arrange
             string removeCargoName = "purple boxes";
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
-            List<CargoItem> itemsRemoved = semiTruck.GetCargoItemsByName(removeCargoName);
+            List<CargoItem> itemsFound = semiTruck.GetCargoItemsByName(removeCargoName);
 
             //assert
             using (new AssertionScope())
             {
-                foreach (CargoItem cargoItem in itemsRemoved)
+                itemsFound.Count.Should().Be(2);
+                foreach (CargoItem item in itemsFound)
                 {
-                    cargoItem.Name.Should().Be(removeCargoName);
+                    item.Name.Should().Be(removeCargoName);
                 }
             }
         }
@@ -127,14 +136,15 @@ namespace CodeLouisvilleUnitTestProjectTests
         {
             //arrange
             string removeCargoName = "packing tape";
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             List<CargoItem> itemsRemoved = semiTruck.GetCargoItemsByName(removeCargoName);
 
             //assert
-            Assert.Empty(itemsRemoved);
+            itemsRemoved.Count.Should().Be(0);
         }
 
         //Verify that searching the Cargo list by description for an item
@@ -144,15 +154,17 @@ namespace CodeLouisvilleUnitTestProjectTests
         {
             //arrange
             string removeCargoDesc = "supplies";
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             List<CargoItem> itemsFound = semiTruck.GetCargoItemsByPartialDescription(removeCargoDesc);
 
             //assert
             using (new AssertionScope())
             {
+                itemsFound.Count.Should().Be(7);
                 foreach (CargoItem cargoItem in itemsFound)
                 {
                     cargoItem.Description.Should().Contain(removeCargoDesc);
@@ -167,14 +179,15 @@ namespace CodeLouisvilleUnitTestProjectTests
         {
             //arrange
             string removeCargoDesc = "produce";
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             List<CargoItem> itemsFound = semiTruck.GetCargoItemsByPartialDescription(removeCargoDesc);
 
             //assert
-            Assert.Empty(itemsFound);
+            itemsFound.Count.Should().Be(0);
         }
 
         //Verify that the method returns the sum of all quantities of all
@@ -183,15 +196,32 @@ namespace CodeLouisvilleUnitTestProjectTests
         public void GetTotalNumberOfItemsReturnsSumOfAllQuantities()
         {
             //arrange
-            //190
+            SemiTruck semiTruck = new ();
+            this.CreateTestCargoList();
+            semiTruck.LoadCargoList(TestCargoList);
 
             //act
-            SemiTruck semiTruck = new SemiTruck();
-            semiTruck.InitializeCargoList();
             int cargoSum = semiTruck.GetTotalNumberOfItems();
 
             //assert
             cargoSum.Should().Be(200);
+        }
+
+        private void CreateTestCargoList()
+        {
+            TestCargoList = new List<CargoItem>
+            {
+                new CargoItem("purple boxes", "moving supplies", 27),
+                new CargoItem("blue boxes", "moving supplies", 25),
+                new CargoItem("red boxes", "moving supplies", 10),
+                new CargoItem("green boxes", "moving supplies", 30),
+                new CargoItem("purple boxes", "moving supplies", 23),
+                new CargoItem("bleach", "cleaning supplies", 15),
+                new CargoItem("mops", "cleaning supplies", 20),
+                new CargoItem("white paint", "home decor", 20),
+                new CargoItem("black paint", "home decor", 20),
+                new CargoItem("grey paint", "home decor", 10)
+            };
         }
     }
 }
