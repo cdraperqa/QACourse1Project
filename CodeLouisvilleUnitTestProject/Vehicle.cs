@@ -23,6 +23,7 @@ namespace CodeLouisvilleUnitTestProject
         #endregion
 
         #region Private Properties
+
         private double _flatTireChance => 0.0001 * NumberOfTires;
         #endregion
 
@@ -108,8 +109,7 @@ namespace CodeLouisvilleUnitTestProject
             return statusString;
         }
 
-//        protected async Task ChangeTireAsync()
-        public async Task ChangeTireAsync()
+        protected async Task ChangeTireAsync()
         {
             if (!HasFlatTire)
                 throw new NoTireToChangeException();
@@ -117,6 +117,18 @@ namespace CodeLouisvilleUnitTestProject
             {
                 await Task.Delay(1000);
                 HasFlatTire = false;
+            }
+        }
+
+        public async Task PublicChangeTireAsync()
+        {
+            try
+            {
+                await ChangeTireAsync();
+            }
+            catch
+            {
+                throw;
             }
         }
 

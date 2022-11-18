@@ -238,7 +238,7 @@ namespace CodeLouisvilleUnitTestProjectTests
             //assert
             try
             {
-                await vehicle.ChangeTireAsync();
+                await vehicle.PublicChangeTireAsync();
             }
             catch (Exception ex)
             {
@@ -262,7 +262,7 @@ namespace CodeLouisvilleUnitTestProjectTests
             //assert
             try
             {
-                await vehicle.ChangeTireAsync();
+                await vehicle.PublicChangeTireAsync();
             }
             catch (Exception ex)
             {
